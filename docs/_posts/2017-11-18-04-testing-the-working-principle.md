@@ -6,7 +6,7 @@ date: 2017-11-18
 
 Well, it's easy, isn't it?
 
-<img src="./images/IMG_0831.JPG" data-rotate="90" />
+<img src="./images/IMG_0831.JPG" />
 
 We have a dye which becomes fluorescent when it is bound to DNA.
 
