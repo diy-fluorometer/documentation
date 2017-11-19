@@ -7,7 +7,7 @@ date: 2017-11-18
 In principle, we just want to build a light-proof case. 
 The "L" form however would be nice to generate a 90° angle:
 
-![](./images/IMG_0834.JPG")
+![](./images/IMG_0834.JPG)
 
 We designed the basics of the case on 
 [http://www.makercase.com](http://www.makercase.com).
