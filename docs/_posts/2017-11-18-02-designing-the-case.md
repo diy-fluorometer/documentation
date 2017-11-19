@@ -13,8 +13,7 @@ We designed the basics of the case on
 [http://www.makercase.com](http://www.makercase.com).
 
 The design is getting ready here in real-time; check it on github:
-[github.com/rgiessmann/DIY_fluorometer/design_case_box](github.com/rgiessmann/DIY_fluorometer/design_case_box)
-.
+[https://github.com/diy-fluorometer/hardware](https://github.com/diy-fluorometer/hardware)
 
 The general idea is to make the case as modular as possible.
 
