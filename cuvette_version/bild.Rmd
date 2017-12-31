@@ -1,0 +1,18 @@
+---
+title: "Eing Bild"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(dplyr)
+```
+
+## Naja zwei
+
+```{r echo=FALSE}
+e <- read.csv("/home/lisa/projects/biolab/hardware/fluorometer/shd17/hardware/data/c3x3_2_1.csv")
+e %>% filter(sample == 10 | sample == 9 |sample == 8 | sample == 7 | sample == 6 ) %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample))) + scale_x_discrete(labels = rev(c("Ctrl - Water", "Ctrl - no DNA", "2ng/ul", "3ng/ul", "5ng/ul")))
+e %>% filter(sample == 5 | sample == 4 |sample == 3 | sample == 2 | sample == 1 | sample == 10 | sample == 9) %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample)))+ scale_x_discrete(labels = rev(c("Ctrl - Water", "Ctrl - no DNA", "10ng/ul", "25ng/ul", "50ng/ul", "75ng/ul", "100ng/ul")))
+```

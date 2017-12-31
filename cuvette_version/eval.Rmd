@@ -1,0 +1,224 @@
+---
+title: "Fluorometer"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+```
+
+## Rosco e-colour+ filters - Candidates
+
+* E010 Medium Yellow
+* E101 Yellow
+* E104 Deep Amber
+* E768 Egg Yolk Yellow
+* E770 Burnt Yellow
+
+all values are MAX
+E101
+
+empty 44
+water100ul  45
+water200ul  38
+marker100ul 96
+marker150ul 106
+20ul marker + 180ul water
+100ulMk 110
+200ulMk 117
+
+lens removed
+empty H44
+200ulMk H56
+
+empty 76M
+200ulMk 187M
+100ulMk 194M
+
+## Comparing filters
+
+The two filter being compared here are
+
+* Rosco e-colour+ filter E101 Yellow
+* Knight Optical 510nm Acrylic Long Pass (https://www.knightoptical.com/_public/documents/1372681788_510nmlongpassfilteracryliccolour510fap.pdf)
+
+The test is done with a fluorescent marker solution (unspecified) in a 5x5 cuvette at 200ul.
+
+M = readout at MAX setting
+H = readout at HIGH setting
+
+Measurement | E101 | 510nm
+----------- | ---- | -----
+Empty       | 121M | 120M
+Cuvette     | 125M | 144M
+Water 200ul | 130M | 144M 
+Dye 200ul   | 181M | 312M
+
+```{r}
+desc <- c(
+  "Empty",
+  "Cuvette",
+  "Water 200ul",
+  "Dye 200ul")
+v <- c(121, 125, 130, 181, 120, 144, 144, 312)
+g <- c(rep("e101", 4), rep("a510nm", 4))
+
+d <- data.frame(desc, v, g)
+d %>% ggplot() + geom_col(mapping = aes(y = v, x = desc, group = g, fill = g), position = "dodge")
+```
+
+This looks like the A510nm performs better - specifically, it seems to let through more of the fluorescent light.
+
+Then I painted the lid black (the part right opposite the blue LED), and lo and behold, the readout for the empty box changed to 30M (filter installed: A510nm).
+I adjusted the lens - both sensor and lens mounts are now at +3 on their scales. Using the 3x3 cuvette:
+Empty: 6M
+Cuvette, empty: 55M
+72ul water: 56M
+72ul dye: 111M
+dye - empty: 56M
+
+Using the 5x5 cuvette:
+Empty: 7M
+Cuvette, empty: 43M
+100ul water: 43M
+200ul water: 41M
+100ul dye: 128M
+200ul dye: 140M
+
+3x3 cuvette
+Empty: 7M
+Cuvette taped, taped side facing sensor, empty: 32
+Cuvette taped, open side facing sensor, empty: 30
+Cuvette taped, taped side facing sensor, 72ul dye: 87
+dye - empty, taped side: 55M
+
+## Dilution series with fluorescent marker dye to compare TSL2591 and TSL235R
+
+The idea here is to make a dilution series of the (cheap) marker dye to test the limits of both sensors - can one sensor detect/quantify lower concentrations of dye than the other?
+
+I will be using the 3x3 cuvette with a 72ul sample volume. Measurements were done in order of decreasing concentration (meaning: highest concentration first, lowest concentration last).
+
+Series:
+
+Sample ID | Active in ul | Water in ul | Dye ul per 1000ul | Reading @ 72ul | Reading, low to high |
+-- | ------------ | ----------- | ----------------- | -------------- | -------------------- |
+0  | 0            | 1000        | 0  | 38 |
+1  | dye:100      | 900         | 100 | 103 |
+2  | 1:250        | 250         | 50 | 104 |
+3  | 2:250        | 250         | 25 | 97 |
+4  | 3:125        | 125         | 12.5 | 86 |
+5  | 4:80         | 80          | 6.25 | 80 |
+6  | 5:40         | 40          | 3.125 | 68 | 68
+
+```{r}
+v <- c(103, 104, 97, 86, 80, 68)
+v - 38
+df <- data.frame(values = v)
+df %>% ggplot() + geom_point(mapping = aes(x = seq_along(v), y = v - 38))
+```
+
+I made some adjustments to the setup: The sensor was out of alignment, and so was the lens, so I adjusted them. After this, the values are as follows:
+
+Empty: 95M
+Cuvette empty: 125
+
+Sample ID | Reading |
+--------- | ------- |
+6 | 28H
+5 | 33H
+4 | 22H
+3 | 67H
+2 | 63H
+1 | 54H
+
+More adjustments - the lens was still out of alignment, quite a lot, so I readjusted it until the light from the chamber visibly hit just the sensor. That brought big changes.
+
+Empty chamber: 25MAX
+C3x3 72ul Sample 1: 117LOw (meaning: HIGH and MAX did not even return any values)
+Cuvette3x3 empty: 26	25	109	-1
+C3x3 72ul Sample 6: 17	16	67	-1
+
+## Testing the TSL235R sensor
+
+C3x3 72ul Sample 6: 
+Empty chamber: 561 p/s
+C3x3 Empty: 13 p/s
+C3x3 72ul Sample 5: 3534 p/s
+C3x3 72ul Sample 4: 
+
+Abandoned test because the sensor was acting wonky - it never seemed to settle on any values but kept slowly increasing and decreasing - maybe remove the capacitor that I added to decouple the power lines as per the suggestion in the sensor's datasheet?
+
+## Testing with DNA
+
+I will be using a dye stock made from 1ul of 10,000X GelGreen plus 99ul of water.
+As a DNA source, I will use the 1kB DNA ladder.
+
+```{r}
+sample_vol <- 72 # microliters
+sample_stock <- 100 # prepare sample stocks of sample_stock microliters
+sample_conc <- c(10, 7.5, 5, 2.5, 1, 0.5, 0.3, 0.2) # list of desired DNA concentrations in micrograms per 100 microliters
+dye_vol <- 10 # fixed volume of dye stock for each sample, in ul
+mrkr_conc = 20 # micrograms per 100 microliters - the DNA marker is given as 0.2mg/ml
+mrkr_vol <- 100 / (mrkr_conc / sample_conc) # volume of DNA marker solution needed for each sample, in ul
+water_vol <- sample_stock - dye_vol - mrkr_vol # volume of water to add to each sample
+total_dna <- sample_vol / sample_stock * sample_conc # total DNA in a sample of volume sample_vol
+
+options(stringsAsFactors=FALSE)
+
+df <- data.frame(sample_conc, mrkr_vol, water_vol, dye_vol, total_vol = mrkr_vol + water_vol + dye_vol, total_dna, comment = c(""), ug_per_ul = sample_conc / 100)
+
+# manually add some controls - will need to be adjusted if you make changes above
+df[nrow(df) + 1,] <- c(0, 0, 90, 10, 100, 0, "No DNA", 0)
+df[nrow(df) + 1,] <- c(0, 0, 100, 0, 100, 0, "No DNA no dye", 0)
+df[nrow(df) + 1,] <- c(0, 0, 0, 0, 0, 0, "Empty cuvette", 0)
+df[nrow(df) + 1,] <- c(0, 0, 0, 0, 0, 0, "Empty chamber", 0)
+df
+```
+
+Convenient overview for sample preparation:
+
+```{r}
+df[,c(2,3,4,7)]
+```
+
+I changed the Arduino sketch quite a bit to get all values to be on the same scale. this means we now have huge values, but eh, at least I can sensibly plot them now.
+
+So let's go again! Results are in file c3x3_2.csv.
+
+```{r}
+e <- read.csv("/home/lisa/projects/biolab/hardware/fluorometer/shd17/hardware/data/c3x3_2_1.csv")
+e %>% filter(sample == 12 | sample == 11 | sample == 10 | sample == 9 |sample == 8 | sample == 7 | sample == 6 ) %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample)))
+e %>% filter(sample == 10 | sample == 9 |sample == 8 | sample == 7 | sample == 6 ) %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample))) + scale_x_discrete(labels = rev(c("Ctrl - Water", "Ctrl - no DNA", "2ng/ul", "3ng/ul", "5ng/ul")))
+e %>% filter(sample == 5 | sample == 4 |sample == 3 | sample == 2 | sample == 1 | sample == 10 | sample == 9) %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample)))+ scale_x_discrete(labels = rev(c("Ctrl - Water", "Ctrl - no DNA", "10ng/ul", "25ng/ul", "50ng/ul", "75ng/ul", "100ng/ul")))
+e %>% filter(sample == 10 | sample == 9 |sample == 8 | sample == 7 | sample == 6 ) %>% group_by(sample) %>% ggplot() + geom_line(mapping = aes(x = reading, y = value, group = factor(sample), color = factor(sample))) 
+e %>% filter(sample == 5 | sample == 4 |sample == 3 | sample == 2 | sample == 1 | sample == 10 | sample == 9) %>% group_by(sample) %>% ggplot() + geom_line(mapping = aes(x = reading, y = value, group = factor(sample), color = factor(sample)))
+```
+
+I changed the code again to do readings on demand only and also to output CSV data. I also hooked up the blue LED to a digital pin (instead of the 3.3V supply pin). The LED is now off by default and only gets switched on when measurements are to be taken, and off again after that. This also means that the LED is now running off of 5V with a 56k resistor, so absolute measurements are likely different than before.
+
+A measurement is started by the command "start <samplename> <num-samples>" and outputs something like (say, "start test1 3"):
+
+```
+test1,1,2478
+test1,2,2489
+test1,3,2469
+```
+
+A measurement can be stopped prematurely by issuing a "stop" command.
+
+All this should make it easier to extract measurements for further processing.
+
+So on to another round! Data is in c3x3_3.csv.
+
+Parameters are: 3x3 cuvette, 72ul sample volume, samples are the same as above. Taking 100 readings per sample.
+
+```{r}
+e <- read.csv("/home/lisa/projects/biolab/hardware/fluorometer/shd17/hardware/data/c3x3_3.csv")
+e %>% filter(sample == 12 | sample == 11 | sample == 10 | sample == 9 |sample == 8 | sample == 7 | sample == 6 ) %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample)))
+e %>% filter(sample == 10 | sample == 9 |sample == 8 | sample == 7 | sample == 6 ) %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample))) + scale_x_discrete(labels = rev(c("Ctrl - Water", "Ctrl - no DNA", "2ng/ul", "3ng/ul", "5ng/ul")))
+e %>% filter(sample == 5 | sample == 4 |sample == 3 | sample == 2 | sample == 1 | sample == 10 | sample == 9) %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample)))+ scale_x_discrete(labels = rev(c("Ctrl - Water", "Ctrl - no DNA", "10ng/ul", "25ng/ul", "50ng/ul", "75ng/ul", "100ng/ul")))
+e %>% filter(sample == 10 | sample == 9 |sample == 8 | sample == 7 | sample == 6 ) %>% group_by(sample) %>% ggplot() + geom_line(mapping = aes(x = reading, y = value, group = factor(sample), color = factor(sample))) 
+e %>% filter(sample == 5 | sample == 4 |sample == 3 | sample == 2 | sample == 1 | sample == 10 | sample == 9) %>% group_by(sample) %>% ggplot() + geom_line(mapping = aes(x = reading, y = value, group = factor(sample), color = factor(sample)))
+```
