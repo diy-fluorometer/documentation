@@ -188,12 +188,12 @@ I changed the Arduino sketch quite a bit to get all values to be on the same sca
 So let's go again! Results are in file c3x3_2.csv.
 
 ```{r}
-e <- read.csv("/home/lisa/projects/biolab/hardware/fluorometer/shd17/hardware/data/c3x3_2_1.csv")
-e %>% filter(sample == 12 | sample == 11 | sample == 10 | sample == 9 |sample == 8 | sample == 7 | sample == 6 ) %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample)))
-e %>% filter(sample == 10 | sample == 9 |sample == 8 | sample == 7 | sample == 6 ) %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample))) + scale_x_discrete(labels = rev(c("Ctrl - Water", "Ctrl - no DNA", "2ng/ul", "3ng/ul", "5ng/ul")))
-e %>% filter(sample == 5 | sample == 4 |sample == 3 | sample == 2 | sample == 1 | sample == 10 | sample == 9) %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample)))+ scale_x_discrete(labels = rev(c("Ctrl - Water", "Ctrl - no DNA", "10ng/ul", "25ng/ul", "50ng/ul", "75ng/ul", "100ng/ul")))
-e %>% filter(sample == 10 | sample == 9 |sample == 8 | sample == 7 | sample == 6 ) %>% group_by(sample) %>% ggplot() + geom_line(mapping = aes(x = reading, y = value, group = factor(sample), color = factor(sample))) 
-e %>% filter(sample == 5 | sample == 4 |sample == 3 | sample == 2 | sample == 1 | sample == 10 | sample == 9) %>% group_by(sample) %>% ggplot() + geom_line(mapping = aes(x = reading, y = value, group = factor(sample), color = factor(sample)))
+d2 <- read.csv("/home/lisa/projects/biolab/hardware/fluorometer/shd17/hardware/data/c3x3_2_1.csv")
+d2 %>% filter(sample == 12 | sample == 11 | sample == 10 | sample == 9 |sample == 8 | sample == 7 | sample == 6 ) %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample)))
+d2 %>% filter(sample == 10 | sample == 9 |sample == 8 | sample == 7 | sample == 6 ) %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample))) + scale_x_discrete(labels = rev(c("Ctrl - Water", "Ctrl - no DNA", "2ng/ul", "3ng/ul", "5ng/ul")))
+d2 %>% filter(sample == 5 | sample == 4 |sample == 3 | sample == 2 | sample == 1 | sample == 10 | sample == 9) %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample)))+ scale_x_discrete(labels = rev(c("Ctrl - Water", "Ctrl - no DNA", "10ng/ul", "25ng/ul", "50ng/ul", "75ng/ul", "100ng/ul")))
+d2 %>% filter(sample == 10 | sample == 9 |sample == 8 | sample == 7 | sample == 6 ) %>% group_by(sample) %>% ggplot() + geom_line(mapping = aes(x = reading, y = value, group = factor(sample), color = factor(sample))) 
+d2 %>% filter(sample == 5 | sample == 4 |sample == 3 | sample == 2 | sample == 1 | sample == 10 | sample == 9) %>% group_by(sample) %>% ggplot() + geom_line(mapping = aes(x = reading, y = value, group = factor(sample), color = factor(sample)))
 ```
 
 I changed the code again to do readings on demand only and also to output CSV data. I also hooked up the blue LED to a digital pin (instead of the 3.3V supply pin). The LED is now off by default and only gets switched on when measurements are to be taken, and off again after that. This also means that the LED is now running off of 5V with a 56k resistor, so absolute measurements are likely different than before.
@@ -215,10 +215,46 @@ So on to another round! Data is in c3x3_3.csv.
 Parameters are: 3x3 cuvette, 72ul sample volume, samples are the same as above. Taking 100 readings per sample.
 
 ```{r}
-e <- read.csv("/home/lisa/projects/biolab/hardware/fluorometer/shd17/hardware/data/c3x3_3.csv")
-e %>% filter(sample == 12 | sample == 11 | sample == 10 | sample == 9 |sample == 8 | sample == 7 | sample == 6 ) %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample)))
-e %>% filter(sample == 10 | sample == 9 |sample == 8 | sample == 7 | sample == 6 ) %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample))) + scale_x_discrete(labels = rev(c("Ctrl - Water", "Ctrl - no DNA", "2ng/ul", "3ng/ul", "5ng/ul")))
-e %>% filter(sample == 5 | sample == 4 |sample == 3 | sample == 2 | sample == 1 | sample == 10 | sample == 9) %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample)))+ scale_x_discrete(labels = rev(c("Ctrl - Water", "Ctrl - no DNA", "10ng/ul", "25ng/ul", "50ng/ul", "75ng/ul", "100ng/ul")))
-e %>% filter(sample == 10 | sample == 9 |sample == 8 | sample == 7 | sample == 6 ) %>% group_by(sample) %>% ggplot() + geom_line(mapping = aes(x = reading, y = value, group = factor(sample), color = factor(sample))) 
-e %>% filter(sample == 5 | sample == 4 |sample == 3 | sample == 2 | sample == 1 | sample == 10 | sample == 9) %>% group_by(sample) %>% ggplot() + geom_line(mapping = aes(x = reading, y = value, group = factor(sample), color = factor(sample)))
+d3 <- read.csv("/home/lisa/projects/biolab/hardware/fluorometer/shd17/hardware/data/c3x3_3.csv")
+d3 %>% filter(sample == 12 | sample == 11 | sample == 10 | sample == 9 |sample == 8 | sample == 7 | sample == 6 ) %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample)))
+d3 %>% filter(sample == 10 | sample == 9 |sample == 8 | sample == 7 | sample == 6 ) %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample))) + scale_x_discrete(labels = rev(c("Ctrl - Water", "Ctrl - no DNA", "2ng/ul", "3ng/ul", "5ng/ul")))
+d3 %>% filter(sample == 5 | sample == 4 |sample == 3 | sample == 2 | sample == 1 | sample == 10 | sample == 9) %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample)))+ scale_x_discrete(labels = rev(c("Ctrl - Water", "Ctrl - no DNA", "10ng/ul", "25ng/ul", "50ng/ul", "75ng/ul", "100ng/ul")))
+d3 %>% filter(sample == 10 | sample == 9 |sample == 8 | sample == 7 | sample == 6 ) %>% group_by(sample) %>% ggplot() + geom_line(mapping = aes(x = reading, y = value, group = factor(sample), color = factor(sample))) 
+d3 %>% filter(sample == 5 | sample == 4 |sample == 3 | sample == 2 | sample == 1 | sample == 10 | sample == 9) %>% group_by(sample) %>% ggplot() + geom_line(mapping = aes(x = reading, y = value, group = factor(sample), color = factor(sample)))
+```
+
+Ok, next, let's do a test with only 50ul sample volume and see whether this could work as well - that would be great because smaller sample volumes are always good: less reagents needed, less sample wasted. Data is in c3x3_4.csv.
+
+```{r}
+d4 <- read.csv("/home/lisa/projects/biolab/hardware/fluorometer/shd17/hardware/data/c3x3_4.csv")
+d4 %>% filter(sample == 12 | sample == 11 | sample == 10 | sample == 9 |sample == 8 | sample == 7 | sample == 6 ) %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample)))
+d4 %>% filter(sample == 10 | sample == 9 |sample == 8 | sample == 7 | sample == 6 ) %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample))) + scale_x_discrete(labels = rev(c("Ctrl - Water", "Ctrl - no DNA", "2ng/ul", "3ng/ul", "5ng/ul")))
+d4 %>% filter(sample == 5 | sample == 4 |sample == 3 | sample == 2 | sample == 1 | sample == 10 | sample == 9) %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample)))+ scale_x_discrete(labels = rev(c("Ctrl - Water", "Ctrl - no DNA", "10ng/ul", "25ng/ul", "50ng/ul", "75ng/ul", "100ng/ul")))
+d4 %>% filter(sample == 10 | sample == 9 |sample == 8 | sample == 7 | sample == 6 ) %>% group_by(sample) %>% ggplot() + geom_line(mapping = aes(x = reading, y = value, group = factor(sample), color = factor(sample))) 
+d4 %>% filter(sample == 5 | sample == 4 |sample == 3 | sample == 2 | sample == 1 | sample == 10 | sample == 9) %>% group_by(sample) %>% ggplot() + geom_line(mapping = aes(x = reading, y = value, group = factor(sample), color = factor(sample)))
+```
+
+
+
+## Dilution series
+
+Instead of calculating and pipetting the different samples individually like I did for the previous measurements, I am now going to make a dilution series. I decided to keep the amount of GelGreen constant for every sample, though. I'll be treating the GelGreen stock like water for the purpose of calculating concentrations, since it mostly is water. I will be using a dye stock of 0.5ul GelGreen 10,000X plus 49.5ul water. This means it's the same concentration as before.
+
+This leads to the following steps:
+
+1. Make sample 2-1: 50ul marker + 40ul water. Yields 90ul at 10ug/90ul. Extract 45ul for the dilution and set aside. Add 5ul dye stock to the rest to get 50ul with 5ug of DNA and a concentration of 100ng/ul.
+2. Make sample 2-2: Take 45ul from previous step and add 45ul water to make 90ul at 5ug/90ul. Set aside 45ul for the dilution. To the test, add 5ul dye stock to get 50ul with 2.5ug of DNA and a concentration of 50ng/ul.
+3. Make sample 2-3: 45ul previous plus 45ul water -> 90ul @ 2.5ug/90ul. Set aside 45ul. To the rest, add 5ul dye stock -> 50ul with 1.25ug DNA and a concentration of 25ng/ul.
+4. Make sample 2-4: 45ul previous plus 45ul water -> 90ul @ 1.25ug/90ul. Set aside 45ul. To the rest, add 5ul dye stock -> 50ul with 0.625ug DNA and a concentration of 12.5ng/ul.
+5. Make sample 2-5: 45ul previous plus 45ul water -> 90ul @ 0.625ug/90ul. Set aside 45ul. To the rest, add 5ul dye stock -> 50ul with 0.3125ug DNA and a concentration of 6.25ng/ul.
+6. Make sample 2-6: 45ul previous plus 45ul water -> 90ul @ 0.3125ug/90ul. Add 10ul dye stock -> 100ul with 0.3125ug DNA and a concentration of 3.125ng/ul.
+
+Measurements are in c3x3_5.csv. For reasons of fraggledom, the sample volume is 45ul.
+
+```{r}
+d5 <- read.csv("/home/lisa/projects/biolab/hardware/fluorometer/shd17/hardware/data/c3x3_5.csv")
+d5 %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample)))
+d5 %>% filter(sample == "2-6" | sample == "2-5" | sample == "9") %>% group_by(sample) %>% ggplot() + geom_boxplot(mapping = aes(x = factor(sample), y = value, group = factor(sample)))
+d5 %>% group_by(sample) %>% ggplot() + geom_line(mapping = aes(x = reading, y = value, group = factor(sample), color = factor(sample)))
+d5 %>% filter(sample == "2-6" | sample == "2-5" | sample == "9") %>% group_by(sample) %>% ggplot() + geom_line(mapping = aes(x = reading, y = value, group = factor(sample), color = factor(sample)))
 ```
